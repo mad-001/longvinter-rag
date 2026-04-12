@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longvinter RAG MCP Server</title>
+    <meta name="description" content="AI-powered semantic search for the Longvinter modding codebase. Search C++ game source, plugins, and docs with natural language via MCP.">
+    <meta property="og:title" content="Longvinter RAG MCP Server">
+    <meta property="og:description" content="AI-powered semantic search for the Longvinter modding codebase">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mad-001.github.io/longvinter-rag/">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --green: #3fb950;
+            --code-bg: #1a1f2b;
+            --code-text: #c9d1d9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hero .tagline {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .hero .buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #46d05a;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        /* Sections */
+        section {
+            padding: 48px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        section h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+        }
+
+        section p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Tools grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .tool-card h3 {
+            font-size: 0.95rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .tool-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Prerequisites list */
+        .prereq-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .prereq-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .prereq-list li:last-child {
+            border-bottom: none;
+        }
+
+        .prereq-list li strong {
+            color: var(--text);
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            position: relative;
+            padding: 24px 0 24px 56px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 24px;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent);
+            line-height: 36px;
+            text-align: center;
+        }
+
+        .step h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            margin-bottom: 12px;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.88rem;
+            color: var(--code-text);
+        }
+
+        p code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Directory tree */
+        .tree {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Config table */
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .config-table th,
+        .config-table td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .config-table th {
+            color: var(--text);
+            font-weight: 600;
+            background: var(--bg-secondary);
+        }
+
+        .config-table td {
+            color: var(--text-muted);
+        }
+
+        .config-table td code {
+            color: var(--accent);
+        }
+
+        /* How it works */
+        .pipeline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .pipeline-arrow {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Attribution */
+        .attribution {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .attribution p {
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--text-muted);
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero {
+                padding: 48px 0 40px;
+            }
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            .hero .tagline {
+                font-size: 1rem;
+            }
+            section h2 {
+                font-size: 1.3rem;
+            }
+            .step {
+                padding-left: 48px;
+            }
+            .pipeline {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pipeline-arrow {
+                transform: rotate(90deg);
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Longvinter RAG MCP Server</h1>
+            <p class="tagline">AI-powered semantic search for the Longvinter modding codebase</p>
+            <div class="buttons">
+                <a href="https://github.com/mad-001/longvinter-rag/releases/latest" class="btn btn-primary">Download Latest Release</a>
+                <a href="https://github.com/mad-001/longvinter-rag" class="btn btn-secondary">View on GitHub</a>
+            </div>
+        </div>
+
+        <!-- What It Does -->
+        <section>
+            <h2>What It Does</h2>
+            <p>This is an <a href="https://modelcontextprotocol.io/">MCP (Model Context Protocol)</a> server that gives AI assistants like <a href="https://claude.ai/code">Claude</a> the ability to search Longvinter's game source code, plugin code, and modding documentation using natural language queries.</p>
+            <p>Built with <a href="https://www.voyageai.com/">Voyage AI</a> embeddings and <a href="https://lancedb.com/">LanceDB</a> vector storage, it parses C++ source files into function-level chunks, embeds them, and serves semantic search results via the MCP protocol.</p>
+        </section>
+
+        <!-- Tools -->
+        <section>
+            <h2>MCP Tools</h2>
+            <p>Six tools are available once the server is running:</p>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>search_longvinter_code</h3>
+                    <p>Semantic search over C++ game source code &mdash; components, game modes, character logic, and more.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>search_longvinter_plugins</h3>
+                    <p>Search UE4 plugin source code: SimpleUGC, AdvancedSessions, ProceduralDungeon, and others.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>search_longvinter_docs</h3>
+                    <p>Search modding guides and map creation documentation.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>longvinter_code_stats</h3>
+                    <p>Game code database statistics &mdash; indexed files, chunks, and coverage.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>longvinter_plugins_stats</h3>
+                    <p>Plugin code database statistics.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>longvinter_docs_stats</h3>
+                    <p>Documentation database statistics.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prerequisites -->
+        <section>
+            <h2>Prerequisites</h2>
+            <ul class="prereq-list">
+                <li><strong>Node.js 18+</strong> &mdash; <a href="https://nodejs.org/">Download</a></li>
+                <li><strong>Voyage AI API key</strong> &mdash; Free tier available with 200M tokens. <a href="https://www.voyageai.com/">Get a key</a></li>
+                <li><strong>Claude Code</strong> or another MCP-compatible client &mdash; <a href="https://claude.ai/code">Get Claude Code</a></li>
+                <li><strong>Longvinter modding source code</strong> &mdash; <a href="https://github.com/Uuvana-Studios/longvinter-modding">Uuvana Studios repo</a> (CC BY-NC)</li>
+            </ul>
+        </section>
+
+        <!-- Setup -->
+        <section>
+            <h2>Setup</h2>
+
+            <div class="steps">
+                <div class="step">
+                    <h3>Clone this repo</h3>
+                    <pre><code>git clone https://github.com/mad-001/longvinter-rag.git
+cd longvinter-rag</code></pre>
+                    <p>Or download the <a href="https://github.com/mad-001/longvinter-rag/releases/latest">latest release</a> and extract it.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Clone the Longvinter modding repo</h3>
+                    <p>The game source code is required for indexing but is not included in this repo. Clone it as a sibling directory:</p>
+                    <pre><code>cd ..
+git clone https://github.com/Uuvana-Studios/longvinter-modding.git longvinter-modding</code></pre>
+                    <p>Your directory structure should look like:</p>
+                    <div class="tree">
+                        parent-folder/<br>
+                        &nbsp;&nbsp;longvinter-rag/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# This repo<br>
+                        &nbsp;&nbsp;longvinter-modding/&nbsp;&nbsp;# Longvinter source (Uuvana Studios)
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>Install dependencies</h3>
+                    <pre><code>cd longvinter-rag
+npm install</code></pre>
+                </div>
+
+                <div class="step">
+                    <h3>Configure API key</h3>
+                    <p>Create a <code>.env</code> file in the <code>longvinter-rag</code> directory:</p>
+                    <pre><code>VOYAGE_API_KEY=pa-your-key-here</code></pre>
+                    <p>Get a free API key at <a href="https://www.voyageai.com/">voyageai.com</a>. The free tier includes 200M tokens, more than enough for indexing.</p>
+                    <p><strong>Tip:</strong> Adding a payment method to your Voyage AI account unlocks higher rate limits (from 3 RPM to standard), making ingestion much faster. You still keep the free tokens.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Run ingestion</h3>
+                    <p>Index the Longvinter codebase into the vector database:</p>
+                    <pre><code># Index everything (code + plugins + docs)
+npm run ingest-all
+
+# Or index individually
+npm run ingest              # Game source code + plugins
+npm run ingest -- --code-only    # Only game source code
+npm run ingest -- --plugins-only # Only plugin source code
+npm run ingest-docs         # Only documentation</code></pre>
+                    <p><strong>Note:</strong> On the free Voyage AI tier, plugin ingestion can take a while due to rate limits. Game source code and docs index quickly.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Add to Claude Code</h3>
+                    <pre><code>claude mcp add longvinter-rag -- bash -c "cd '/path/to/longvinter-rag' && set -a && source .env && set +a && npx tsx src/index.ts"</code></pre>
+                    <p>Replace <code>/path/to/longvinter-rag</code> with the actual path to your cloned repo. Restart Claude Code and the tools will be available.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration -->
+        <section>
+            <h2>Configuration</h2>
+            <table class="config-table">
+                <thead>
+                    <tr>
+                        <th>Environment Variable</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>VOYAGE_API_KEY</code></td>
+                        <td>(required)</td>
+                        <td>Voyage AI API key</td>
+                    </tr>
+                    <tr>
+                        <td><code>LONGVINTER_RAG_DB_PATH</code></td>
+                        <td><code>./data/lancedb</code></td>
+                        <td>Path to LanceDB database</td>
+                    </tr>
+                    <tr>
+                        <td><code>LONGVINTER_MODDING_PATH</code></td>
+                        <td><code>../longvinter-modding</code></td>
+                        <td>Path to the Longvinter modding repo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- How It Works -->
+        <section>
+            <h2>How It Works</h2>
+            <div class="pipeline">
+                <div class="pipeline-step">Parsing</div>
+                <span class="pipeline-arrow">&rarr;</span>
+                <div class="pipeline-step">Embedding</div>
+                <span class="pipeline-arrow">&rarr;</span>
+                <div class="pipeline-step">Storage</div>
+                <span class="pipeline-arrow">&rarr;</span>
+                <div class="pipeline-step">Search</div>
+                <span class="pipeline-arrow">&rarr;</span>
+                <div class="pipeline-step">MCP</div>
+            </div>
+            <p style="margin-top: 20px;">C++ source files are parsed into function/method-level chunks with metadata (file path, class name, function name, line numbers). Each chunk is embedded using Voyage AI's <code>voyage-code-3</code> model for code or <code>voyage-4-large</code> for documentation. Embeddings are stored in a local LanceDB vector database. Natural language queries are embedded and matched against stored vectors using similarity search, and results are served via the Model Context Protocol.</p>
+        </section>
+
+        <!-- Attribution -->
+        <section>
+            <h2>Attribution &amp; License</h2>
+            <div class="attribution">
+                <p>This tool indexes the <a href="https://github.com/Uuvana-Studios/longvinter-modding">Longvinter modding source code</a> by <a href="https://www.uuvana.com/">Uuvana Studios</a>.</p>
+                <p>The Longvinter modding source code is licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial (CC BY-NC)</a>. This tool is provided for non-commercial use only, in compliance with that license.</p>
+                <p>Longvinter is a trademark of Uuvana Studios. This project is not affiliated with or endorsed by Uuvana Studios.</p>
+                <p style="margin-top: 16px;"><strong>License:</strong> MIT &mdash; The RAG tool code in this repository is original work. The Longvinter game source code it indexes is subject to its own <a href="https://github.com/Uuvana-Studios/longvinter-modding/blob/main/LICENSE">CC BY-NC license</a>.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-links">
+                <a href="https://github.com/mad-001/longvinter-rag">GitHub</a>
+                <a href="https://github.com/mad-001/longvinter-rag/releases">Releases</a>
+                <a href="https://www.longvinter.com/">Longvinter</a>
+                <a href="https://www.uuvana.com/">Uuvana Studios</a>
+                <a href="https://www.voyageai.com/">Voyage AI</a>
+                <a href="https://lancedb.com/">LanceDB</a>
+                <a href="https://modelcontextprotocol.io/">MCP</a>
+            </div>
+            <p>Built for the Longvinter modding community</p>
+        </footer>
+
+    </div>
+</body>
+</html>

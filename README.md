@@ -23,7 +23,7 @@ Built with [Voyage AI](https://www.voyageai.com/) embeddings and [LanceDB](https
 ### 1. Clone this repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/longvinter-rag.git
+git clone https://github.com/mad-001/longvinter-rag.git
 cd longvinter-rag
 ```
 
