@@ -13,21 +13,21 @@
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
         :root {
-            --bg: #c8e6c0;
-            --bg-secondary: #b8ddb0;
-            --bg-card: #e0f0dc;
-            --border: #a8d4a0;
-            --text: #2d4030;
-            --text-muted: #4a6850;
-            --accent: #9b7ec8;
-            --accent-hover: #8568b8;
-            --green: #6db86d;
-            --green-hover: #5ea85e;
-            --green-light: #d4ecd0;
-            --purple-light: #ddd0f0;
-            --code-bg: #d8ccec;
-            --code-text: #4a3d6b;
-            --hero-bg: linear-gradient(135deg, #b8ddb0 0%, #d0c4e8 50%, #c0ddb8 100%);
+            --bg: #8db88a;
+            --bg-secondary: #7daa7a;
+            --bg-card: #c8e0c4;
+            --border: #6d9a6a;
+            --text: #1a2e1c;
+            --text-muted: #2d4a30;
+            --accent: #8b6cb8;
+            --accent-hover: #7858a8;
+            --green: #5a9a58;
+            --green-hover: #4d8d4b;
+            --green-light: #b8d8b4;
+            --purple-light: #c8b8e0;
+            --code-bg: #c0b0d8;
+            --code-text: #3a2d58;
+            --hero-bg: linear-gradient(135deg, #7daa7a 0%, #b8a8d4 50%, #88b886 100%);
         }
 
         * {
@@ -63,7 +63,7 @@
         .hero {
             text-align: center;
             padding: 80px 0 60px;
-            background: var(--hero-bg);
+            background: linear-gradient(135deg, #5a8a58 0%, #6a5a90 50%, #5a8858 100%);
             border-radius: 0 0 32px 32px;
             margin-bottom: 16px;
         }
@@ -72,13 +72,14 @@
             font-size: 2.8rem;
             font-weight: 800;
             margin-bottom: 12px;
-            color: #5a4880;
+            color: #f0e8ff;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
 
         .hero .tagline {
             font-size: 1.2rem;
-            color: var(--text-muted);
+            color: #e0d8f0;
             margin-bottom: 32px;
             font-weight: 600;
         }
@@ -108,34 +109,34 @@
         }
 
         .btn-primary {
-            background: var(--green);
-            color: #fff;
+            background: #90cc8e;
+            color: #1a2e1c;
         }
 
         .btn-primary:hover {
-            background: var(--green-hover);
-            color: #fff;
+            background: #a0d89e;
+            color: #1a2e1c;
         }
 
         .btn-secondary {
-            background: var(--bg-card);
-            color: var(--accent);
-            border: 2px solid var(--accent);
+            background: rgba(255,255,255,0.15);
+            color: #f0e8ff;
+            border: 2px solid rgba(255,255,255,0.4);
         }
 
         .btn-secondary:hover {
-            background: var(--purple-light);
-            color: var(--accent);
+            background: rgba(255,255,255,0.25);
+            color: #fff;
         }
 
         /* Sections */
         section {
-            padding: 48px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        section:last-child {
-            border-bottom: none;
+            padding: 32px;
+            margin: 20px 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
         section h2 {
@@ -263,7 +264,7 @@
         /* Code blocks */
         pre {
             background: var(--code-bg);
-            border: 1px solid #d4cfe8;
+            border: 1px solid #a898c8;
             border-radius: 12px;
             padding: 16px;
             overflow-x: auto;
@@ -285,7 +286,7 @@
         /* Directory tree */
         .tree {
             background: var(--green-light);
-            border: 1px solid #c4d8c4;
+            border: 1px solid #7daa7a;
             border-radius: 12px;
             padding: 16px;
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
