@@ -486,10 +486,10 @@
             <h2>Prerequisites</h2>
             <ul class="prereq-list">
                 <li><strong>Node.js 18+</strong> &mdash; <a href="https://nodejs.org/">Download</a></li>
-                <li><strong>Voyage AI API key</strong> &mdash; Free tier available with 200M tokens. <a href="https://www.voyageai.com/">Get a key</a></li>
+                <li><strong>Voyage AI API key</strong> &mdash; Free tier with 200M tokens, no credit card needed. <a href="https://www.voyageai.com/">Get a free key</a></li>
                 <li><strong>Claude Code</strong> or another MCP-compatible client &mdash; <a href="https://claude.ai/code">Get Claude Code</a></li>
-                <li><strong>Longvinter modding source code</strong> &mdash; <a href="https://github.com/Uuvana-Studios/longvinter-modding">Uuvana Studios repo</a> (CC BY-NC)</li>
             </ul>
+            <p>The pre-built search database is included &mdash; no game source code download or indexing required. Just clone, configure your key, and go!</p>
         </section>
 
         <!-- Setup -->
@@ -498,15 +498,39 @@
 
             <div class="steps">
                 <div class="step">
-                    <h3>Clone this repo</h3>
+                    <h3>Download</h3>
+                    <p>Clone the repo or download the <a href="https://github.com/mad-001/longvinter-rag/releases/latest">latest release</a>:</p>
                     <pre><code>git clone https://github.com/mad-001/longvinter-rag.git
 cd longvinter-rag</code></pre>
-                    <p>Or download the <a href="https://github.com/mad-001/longvinter-rag/releases/latest">latest release</a> and extract it.</p>
                 </div>
 
                 <div class="step">
+                    <h3>Install dependencies</h3>
+                    <pre><code>npm install</code></pre>
+                </div>
+
+                <div class="step">
+                    <h3>Configure API key</h3>
+                    <p>Create a <code>.env</code> file in the <code>longvinter-rag</code> directory:</p>
+                    <pre><code>VOYAGE_API_KEY=pa-your-key-here</code></pre>
+                    <p>Get a free key at <a href="https://www.voyageai.com/">voyageai.com</a> &mdash; 200M free tokens, no credit card required. The key is needed to convert your search queries into vectors.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Add to Claude Code</h3>
+                    <pre><code>claude mcp add longvinter-rag -- bash -c "cd '/path/to/longvinter-rag' && set -a && source .env && set +a && npx tsx src/index.ts"</code></pre>
+                    <p>Replace <code>/path/to/longvinter-rag</code> with the actual path. Restart Claude Code and the tools will be available.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rebuilding -->
+        <section>
+            <h2>Rebuilding the Database (Optional)</h2>
+            <p>Want to re-index after a Longvinter update? You'll need a <a href="https://www.voyageai.com/">Voyage AI API key</a> (free tier available) and the <a href="https://github.com/Uuvana-Studios/longvinter-modding">Longvinter modding source code</a>.</p>
+            <div class="steps">
+                <div class="step">
                     <h3>Clone the Longvinter modding repo</h3>
-                    <p>The game source code is required for indexing but is not included in this repo. Clone it as a sibling directory:</p>
                     <pre><code>cd ..
 git clone https://github.com/Uuvana-Studios/longvinter-modding.git longvinter-modding</code></pre>
                     <p>Your directory structure should look like:</p>
@@ -518,70 +542,17 @@ git clone https://github.com/Uuvana-Studios/longvinter-modding.git longvinter-mo
                 </div>
 
                 <div class="step">
-                    <h3>Install dependencies</h3>
-                    <pre><code>cd longvinter-rag
-npm install</code></pre>
-                </div>
-
-                <div class="step">
                     <h3>Configure API key</h3>
-                    <p>Create a <code>.env</code> file in the <code>longvinter-rag</code> directory:</p>
+                    <p>Create a <code>.env</code> file:</p>
                     <pre><code>VOYAGE_API_KEY=pa-your-key-here</code></pre>
-                    <p>Get a free API key at <a href="https://www.voyageai.com/">voyageai.com</a>. The free tier includes 200M tokens, more than enough for indexing.</p>
-                    <p><strong>Tip:</strong> Adding a payment method to your Voyage AI account unlocks higher rate limits (from 3 RPM to standard), making ingestion much faster. You still keep the free tokens.</p>
+                    <p>Get a free key at <a href="https://www.voyageai.com/">voyageai.com</a> (200M free tokens).</p>
                 </div>
 
                 <div class="step">
                     <h3>Run ingestion</h3>
-                    <p>Index the Longvinter codebase into the vector database:</p>
-                    <pre><code># Index everything (code + plugins + docs)
-npm run ingest-all
-
-# Or index individually
-npm run ingest              # Game source code + plugins
-npm run ingest -- --code-only    # Only game source code
-npm run ingest -- --plugins-only # Only plugin source code
-npm run ingest-docs         # Only documentation</code></pre>
-                    <p><strong>Note:</strong> On the free Voyage AI tier, plugin ingestion can take a while due to rate limits. Game source code and docs index quickly.</p>
-                </div>
-
-                <div class="step">
-                    <h3>Add to Claude Code</h3>
-                    <pre><code>claude mcp add longvinter-rag -- bash -c "cd '/path/to/longvinter-rag' && set -a && source .env && set +a && npx tsx src/index.ts"</code></pre>
-                    <p>Replace <code>/path/to/longvinter-rag</code> with the actual path to your cloned repo. Restart Claude Code and the tools will be available.</p>
+                    <pre><code>npm run ingest-all</code></pre>
                 </div>
             </div>
-        </section>
-
-        <!-- Configuration -->
-        <section>
-            <h2>Configuration</h2>
-            <table class="config-table">
-                <thead>
-                    <tr>
-                        <th>Environment Variable</th>
-                        <th>Default</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>VOYAGE_API_KEY</code></td>
-                        <td>(required)</td>
-                        <td>Voyage AI API key</td>
-                    </tr>
-                    <tr>
-                        <td><code>LONGVINTER_RAG_DB_PATH</code></td>
-                        <td><code>./data/lancedb</code></td>
-                        <td>Path to LanceDB database</td>
-                    </tr>
-                    <tr>
-                        <td><code>LONGVINTER_MODDING_PATH</code></td>
-                        <td><code>../longvinter-modding</code></td>
-                        <td>Path to the Longvinter modding repo</td>
-                    </tr>
-                </tbody>
-            </table>
         </section>
 
         <!-- How It Works -->

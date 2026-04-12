@@ -4,8 +4,8 @@ node_modules/
 # Build output
 dist/
 
-# Vector database (contains embeddings of copyrighted code - users must generate their own)
-data/
+# Vector database - uncomment to exclude (684KB, included for convenience)
+# data/
 
 # Environment variables (contains API keys)
 .env
